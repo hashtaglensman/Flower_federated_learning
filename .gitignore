@@ -1,0 +1,38 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.so
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Local environment
+.env
+.venv/
+*.egg-info/
+*.log
+
+# Hugging Face & model cache
+cache_dir/
+*.bin
+*.pt
+
+# Weights & Biases logs
+wandb/
+
+# Output directories
+outputs/
+logs/
+runs/
+
+# VSCode and other IDE/editor configs
+.vscode/
+*.swp
+
+# PyTorch Lightning & HF Trainer checkpoints
+checkpoints/
+*.ckpt
+
+# System files
+.DS_Store
+Thumbs.db
