@@ -16,12 +16,14 @@ __pycache__/
 cache_dir/
 *.bin
 *.pt
+*.pth   # <-- ADD this line for PyTorch model files
 
 # Weights & Biases logs
 wandb/
 
 # Output directories
 outputs/
+outputs/**/model_state_*.pth  # <- ignore large checkpoints
 logs/
 runs/
 
