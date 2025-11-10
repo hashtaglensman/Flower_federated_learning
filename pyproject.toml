@@ -1,0 +1,173 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "huggingface_example"
+version = "1.0.0"
+description = "Federated Learning with Hugginface Transformers and Flower (Quickstart Example)"
+license = "Apache-2.0"
+authors = [
+    { name = "The Flower Authors", email = "hello@flower.ai" },
+    { name = "Anoop Krishnan", email = "anoopk682@gmail.com" },
+]
+
+dependencies = [
+    "flwr[simulation]>=1.19.0",
+    "flwr-datasets>=0.5.0",
+    "torch==2.6.0",
+    "transformers>=4.30.0,<5.0",
+    "evaluate>=0.4.0,<1.0",
+    "datasets>=2.0.0, <3.0",
+    "scikit-learn>=1.3.1, <2.0",
+    "seqeval>=1.2.2",
+    "wandb==0.17.8",
+    "asyncio-atexit==1.0.1",
+    # "poetry==2.1.3",
+    # "opacus==v1.4.1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[tool.flwr.app]
+publisher = "flwrlabs"
+
+[tool.flwr.app.components]
+serverapp = "huggingface_example.server_app_seg:app"
+clientapp = "huggingface_example.client_app_seg:app"
+
+[tool.flwr.app.config]
+num-server-rounds = 10
+model-name = "bert-base-uncased"
+fraction-fit = 1
+fraction-evaluate = 1
+local-epochs = 1
+server-device = "cpu"#"cuda:0"
+server-num-cpus = 1 
+server-cpu-core = "auto"
+use-wandb = 1
+target-delta = 0.01
+max-grad-norm = 1.0
+rr-flip-prob = 0.2
+rr-epsilon = 1.0
+
+# Parameters for the SecAgg+ protocol
+is-demo = false
+num-shares = 3
+reconstruction-threshold = 2
+max-weight = 9000
+timeout = 15.0
+
+# Personalized LDP: per-client ε budgets.
+# Accessible in code via context.run_config["personalized-epsilon-map"]
+[tool.flwr.app.config.personalized-epsilon-map]
+"0" = 2   # client/partition 0 → most sensitive
+"1" = 6.0   # client/partition 1
+"2" = 10.0  # client/partition 2 → least sensitive
+# "8" = 2.0  # client/partition 2 → least sensitive
+# "9" = 10.0  # client/partition 2 → least sensitive
+
+# CLIP_NORM = 1.0        # L2 clipping radius
+# EPSILON   = 8.0        # total privacy budget
+# DELTA     = 1e-5       # failure probability
+# SENSITIVITY = 1.0
+
+# [tool.flwr.federations]
+# default = "local-simulation"
+
+
+# [tool.flwr.federations.local-simulation-gpu]
+# options.num-supernodes = 8
+# options.backend.client-resources.num-cpus = 0 # each ClientApp assumes to use 4CPUs
+# options.backend.client-resources.num-gpus = 1 # at most 4 ClientApp will run in a given GPU (lower it to increase parallelism)
+# ──────────────────────────────────────────────────────────────────────────────
+# pyproject.toml  ←  only the Flower-specific part needs changing
+# ──────────────────────────────────────────────────────────────────────────────
+
+[tool.flwr.federations]
+
+# Default profile (what you run today)
+default = "local-simulation"
+
+# [tool.flwr.federations.local-simulation]
+# options.num-supernodes = 4
+
+# One profile for each experiment ↓↓↓
+exp-8c-1g  = "sim-8c-1g"
+exp-16c-2g = "sim-16c-2g"
+exp-32c-4g = "sim-32c-4g"
+exp-48c-6g = "sim-48c-6g"
+exp-64c-8g = "sim-64c-8g"
+
+# [tool.flwr.federations.local-simulation]
+
+# --------------------------------------------------------------------------- #
+# Each profile below requests *zero* CPU and a GPU fraction that lets exactly
+# 8 clients fit on every physical GPU.  (8 clients ÷ 1 GPU = 1/8 = 0.125)
+# --------------------------------------------------------------------------- #
+
+[tool.flwr.federations.sim-8c-1g]     # 8 clients, 1 GPU
+backend                                      = "ray"
+options.num-supernodes                       = 8
+options.backend.client-resources.num-cpus    = 1
+options.backend.client-resources.num-gpus    = 0.125   # 8 clients per GPU
+# options.backend.init_args.num_gpus           = 1
+options.backend.init_args.address = "auto"  # Good! Uses RAY_ADDRESS
+
+
+
+[tool.flwr.federations.sim-16c-2g]    # 16 clients, 2 GPUs
+options.num-supernodes                       = 16
+backend                                      = "ray"
+options.backend.client-resources.num-cpus    = 1
+options.backend.client-resources.num-gpus    = 0.125   # 8 per GPU
+# options.backend.init_args.num_gpus           = 2
+options.backend.init_args.address = "auto"  # Good! Uses RAY_ADDRESS
+
+
+[tool.flwr.federations.sim-32c-4g]    # 32 clients, 4 GPUs
+options.num-supernodes                       = 32
+backend                                      = "ray"
+options.backend.client-resources.num-cpus    = 1
+options.backend.client-resources.num-gpus    = 0.125
+# options.backend.init_args.num_gpus           = 4
+options.backend.init_args.address = "auto"  # Good! Uses RAY_ADDRESS
+
+
+[tool.flwr.federations.sim-48c-6g]    # 48 clients, 6 GPUs
+options.num-supernodes                       = 48
+backend                                      = "ray"
+options.backend.client-resources.num-cpus    = 1
+options.backend.client-resources.num-gpus    = 0.125
+# options.backend.init_args.num_gpus           = 6
+options.backend.init_args.address = "auto"  # Good! Uses RAY_ADDRESS
+
+
+[tool.flwr.federations.sim-64c-8g]    # 64 clients, 8 GPUs
+options.num-supernodes                       = 64
+backend                                      = "ray"
+options.backend.client-resources.num-cpus    = 1
+options.backend.client-resources.num-gpus    = 0.125 #0.125
+# options.backend.init_args.num_gpus           = 8
+options.backend.init_args.address = "auto"  # Good! Uses RAY_ADDRESS
+
+
+
+[tool.flwr.federations.sim-16c-2g-2nodes]
+backend = "ray"
+options.num-supernodes = 16
+options.backend.client-resources.num_cpus = 1
+options.backend.client-resources.num_gpus = 0.125 
+# options.backend.init_args.num_gpus = 2
+options.backend.init_args.address = "auto"  # Good! Uses RAY_ADDRESS
+options.backend.init_args.ignore_reinit_error = true  # Recommended
+
+[tool.flwr.federations.sim-24c-3g-3nodes]
+backend = "ray"
+options.num-supernodes = 24
+options.backend.client-resources.num_cpus = 1
+options.backend.client-resources.num_gpus = 0.125 
+# options.backend.init_args.num_gpus = 2
+options.backend.init_args.address = "auto"  # Good! Uses RAY_ADDRESS
+options.backend.init_args.ignore_reinit_error = true  # Recommended
