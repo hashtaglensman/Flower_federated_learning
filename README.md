@@ -102,7 +102,7 @@ quickstart-huggingface/
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/hashtaglensman/Flower_federated_learning.git
 cd quickstart-huggingface
 
 # Install dependencies
@@ -311,7 +311,7 @@ If you use this code in your research, please cite:
   title = {Privacy-Preserving Federated Learning with HuggingFace and Flower},
   author = {Krishnan, Anoop and Flower Authors},
   year = {2024},
-  url = {https://github.com/your-repo/quickstart-huggingface}
+  url = {https://github.com/hashtaglensman/Flower_federated_learning.git}
 }
 ```
 
