@@ -310,7 +310,7 @@ If you use this code in your research, please cite:
 @software{flower_huggingface_privacy,
   title = {Privacy-Preserving Federated Learning with HuggingFace and Flower},
   author = {Krishnan, Anoop and Flower Authors},
-  year = {2024},
+  year = {2025},
   url = {https://github.com/hashtaglensman/Flower_federated_learning.git}
 }
 ```
